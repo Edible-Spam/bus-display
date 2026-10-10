@@ -10,8 +10,6 @@ class TimetableDisplay:
         self.g = self.board.display
         self.g.set_font("bitmap8")
         self.compact = PANEL == "DISPLAY_INTERSTATE75_64X32"
-        if self.compact:
-            self.g.set_font("bitmap6")
         self.black = self.g.create_pen(0, 0, 0)
         self.white = self.g.create_pen(220, 220, 220)
         self.cyan = self.g.create_pen(0, 210, 230)
@@ -35,8 +33,7 @@ class TimetableDisplay:
     def show_departures(self, departures, refreshed_at):
         self.clear()
         if self.compact:
-            # bitmap6 fits both the seven-character combined route and a
-            # right-aligned countdown on a 64-pixel panel.
+            # Keep the full combined route label and right-align the countdown.
             self.text("Pitt St" if STOP_NAME == "PITT ST" else STOP_NAME, 1, 0, self.cyan, 7)
             self.right_text(format_clock(time.time()), 0, self.green)
             if not departures:
