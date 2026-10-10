@@ -1,7 +1,7 @@
 """Settings for this single-stop PTV timetable display."""
 
 # Set this to a valid Interstate75 display constant for your HUB75 panel.
-PANEL = "DISPLAY_INTERSTATE75_128X64"
+PANEL = "DISPLAY_INTERSTATE75_64X32"
 # PTV route types: train=0, tram=1, bus=2, V/Line=3, Night Bus=4.
 ROUTE_TYPES = (2,)
 STOP_ID = 0

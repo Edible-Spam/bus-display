@@ -13,7 +13,9 @@ the last departures when Wi-Fi or the API briefly fails.
    panel size. Bus is route type `2`.
 4. Upload all `.py` files to the Pico W's root in Thonny; run `main.py`.
 
-The default layout is for a 128×64 panel and shows the next three services.
+The default layout is for a 64×32 panel and shows the next two route/due pairs.
+For a 128×64 panel, set `PANEL` to `DISPLAY_INTERSTATE75_128X64`; the wider
+layout then shows three services with destinations.
 Power the HUB75 panel from a separate, suitably rated 5 V supply; do not power
 it through the Interstate 75 W USB connection.
 
