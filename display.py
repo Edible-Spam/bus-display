@@ -30,11 +30,29 @@ class TimetableDisplay:
         x = 63 - self.g.measure_text(value, scale=1)
         self.text(value, x, y, pen, len(value))
 
+    def bus_icon(self):
+        # A 12x8 bitmap fits the header with the same one-pixel top margin.
+        bitmap = (
+            "011111111110",
+            "110000000011",
+            "111011011111",
+            "111011011111",
+            "111111111111",
+            "110111111011",
+            "011111111110",
+            "001100001100",
+        )
+        self.g.set_pen(self.cyan)
+        for y, row in enumerate(bitmap):
+            for x, pixel in enumerate(row):
+                if pixel == "1":
+                    self.g.pixel(x + 1, y + 1)
+
     def show_departures(self, departures, refreshed_at):
         self.clear()
         if self.compact:
             # Keep the full combined route label and right-align the countdown.
-            self.text("Pitt St" if STOP_NAME == "PITT ST" else STOP_NAME, 1, 0, self.cyan, 7)
+            self.bus_icon()
             self.right_text(format_clock(time.time()), 0, self.red)
             if not departures:
                 self.text("NO BUS", 1, 14, self.amber, 7)
@@ -59,7 +77,7 @@ class TimetableDisplay:
     def show_error(self, message):
         self.clear()
         if self.compact:
-            self.text(STOP_NAME, 1, 0, self.cyan, 7)
+            self.bus_icon()
             self.text("ERROR", 1, 11, self.red, 7)
             self.text(message, 1, 22, self.amber, 7)
             self.board.update()
