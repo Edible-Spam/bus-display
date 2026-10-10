@@ -7,6 +7,9 @@ ROUTE_TYPES = (2,)
 # Pitt St/Rathdowne St, Carlton — southbound / city-bound side. This stop
 # serves route 250 to City (Queen St) and 251 to Little Collins St.
 STOP_ID = 659
+# 659 is the public/GTFS stop ID printed for this bus stop. PTV's departure
+# endpoint requires an explicit flag when using a GTFS stop ID.
+STOP_ID_IS_GTFS = True
 STOP_NAME = "PITT ST"
 MAX_RESULTS_PER_TYPE = 4
 REFRESH_SECONDS = 30

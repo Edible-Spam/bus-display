@@ -8,7 +8,7 @@ except ImportError:
     import hashlib
     import binascii
 
-from config import MAX_RESULTS_PER_TYPE, REQUEST_TIMEOUT_SECONDS
+from config import MAX_RESULTS_PER_TYPE, REQUEST_TIMEOUT_SECONDS, STOP_ID_IS_GTFS
 
 BASE_URL = "https://timetableapi.ptv.vic.gov.au"
 
@@ -32,8 +32,11 @@ class PTVClient:
 
     def departures(self, route_type, stop_id):
         # PTV signs the path and query string, excluding the signature itself.
-        path = "/v3/departures/route_type/%d/stop/%d?max_results=%d&devid=%s" % (
-            route_type, stop_id, MAX_RESULTS_PER_TYPE, self.developer_id)
+        path = "/v3/departures/route_type/%d/stop/%d?max_results=%d" % (
+            route_type, stop_id, MAX_RESULTS_PER_TYPE)
+        if STOP_ID_IS_GTFS:
+            path += "&gtfs=true"
+        path += "&devid=" + self.developer_id
         response = requests.get(
             BASE_URL + path + "&signature=" + hmac_sha1(self.api_key, path),
             timeout=REQUEST_TIMEOUT_SECONDS,
