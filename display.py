@@ -35,7 +35,7 @@ class TimetableDisplay:
         if self.compact:
             # Keep the full combined route label and right-align the countdown.
             self.text("Pitt St" if STOP_NAME == "PITT ST" else STOP_NAME, 1, 0, self.cyan, 7)
-            self.right_text(format_clock(time.time()), 0, self.green)
+            self.right_text(format_clock(time.time()), 0, self.red)
             if not departures:
                 self.text("NO BUS", 1, 14, self.amber, 7)
             for index, item in enumerate(departures[:2]):
