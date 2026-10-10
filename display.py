@@ -30,6 +30,25 @@ class TimetableDisplay:
         x = 63 - self.g.measure_text(value, scale=1)
         self.text(value, x, y, pen, len(value))
 
+    def ptv_icon(self):
+        # Supplied five-dot logo, reduced to 15x8 pixels. Zero pixels are
+        # unpainted so the logo has no background rectangle.
+        bitmap = (
+            "010010010010010",
+            "000000000000000",
+            "111111101111111",
+            "000001101100000",
+            "000001101100000",
+            "000001101100000",
+            "000001101100000",
+            "000001101100000",
+        )
+        self.g.set_pen(self.cyan)
+        for y, row in enumerate(bitmap):
+            for x, pixel in enumerate(row):
+                if pixel == "1":
+                    self.g.pixel(x + 15, y + 1)
+
     def bus_icon(self):
         # A 12x8 bitmap fits the header with the same one-pixel top margin.
         bitmap = (
@@ -53,6 +72,7 @@ class TimetableDisplay:
         if self.compact:
             # Keep the full combined route label and right-align the countdown.
             self.bus_icon()
+            self.ptv_icon()
             self.right_text(format_clock(time.time()), 0, self.red)
             if not departures:
                 self.text("NO BUS", 1, 14, self.amber, 7)
@@ -78,6 +98,7 @@ class TimetableDisplay:
         self.clear()
         if self.compact:
             self.bus_icon()
+            self.ptv_icon()
             self.text("ERROR", 1, 11, self.red, 7)
             self.text(message, 1, 22, self.amber, 7)
             self.board.update()
