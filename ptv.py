@@ -36,7 +36,8 @@ class PTVClient:
             route_type, stop_id, MAX_RESULTS_PER_TYPE)
         if STOP_ID_IS_GTFS:
             path += "&gtfs=true"
-        path += "&devid=" + self.developer_id
+        # Route expansion supplies route_number for each departure's route_id.
+        path += "&expand=2&devid=" + self.developer_id
         response = requests.get(
             BASE_URL + path + "&signature=" + hmac_sha1(self.api_key, path),
             timeout=REQUEST_TIMEOUT_SECONDS,

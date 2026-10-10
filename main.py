@@ -53,6 +53,7 @@ async def refresh_loop(display, client, state):
             state["last_error"] = None
             state["departures"] = len(cached)
             state["raw_departures"] = raw_departures
+            state["next_routes"] = [item["route"] for item in cached[:2]]
         except Exception as error:
             state["last_error"] = str(error)[:80]
             if cached:

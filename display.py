@@ -19,7 +19,7 @@ class TimetableDisplay:
 
     def text(self, value, x, y, pen, limit=20):
         self.g.set_pen(pen)
-        self.g.text(str(value)[:limit], x, y, scale=1)
+        self.g.text(str(value)[:limit], x, y + 1, scale=1)
 
     def clear(self):
         self.g.set_pen(self.black)
