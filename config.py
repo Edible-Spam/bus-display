@@ -4,8 +4,10 @@
 PANEL = "DISPLAY_INTERSTATE75_64X32"
 # PTV route types: train=0, tram=1, bus=2, V/Line=3, Night Bus=4.
 ROUTE_TYPES = (2,)
-STOP_ID = 0
-STOP_NAME = "Configure stop"
+# Pitt St/Rathdowne St, Carlton — southbound / city-bound side. This stop
+# serves route 250 to City (Queen St) and 251 to Little Collins St.
+STOP_ID = 659
+STOP_NAME = "PITT ST"
 MAX_RESULTS_PER_TYPE = 4
 REFRESH_SECONDS = 30
 REQUEST_TIMEOUT_SECONDS = 12
