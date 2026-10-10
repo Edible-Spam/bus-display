@@ -79,8 +79,8 @@ class TimetableDisplay:
         self.clear()
         if self.compact:
             self.ptv_icon()
-            self.text("ERROR", 1, 11, self.red, 7)
-            self.text(message, 1, 22, self.amber, 7)
+            self.text("NO DATA", 1, 11, self.red, 7)
+            self.text("RETRYING", 1, 22, self.amber, 8)
             self.board.update()
             return
         self.text(STOP_NAME, 1, 1, self.cyan)

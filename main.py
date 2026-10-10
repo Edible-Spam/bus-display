@@ -76,33 +76,35 @@ def departures(client):
 
 
 async def refresh_loop(display, client, state):
-    cached = []
+    from wifi import ensure_connected
     while True:
         try:
-            cached, raw_departures = departures(client)
+            await ensure_connected()
+            current, raw_departures = departures(client)
             refreshed = format_clock(time.time())
-            display.show_departures(cached, refreshed)
+            display.show_departures(current, refreshed)
             state["last_refresh"] = refreshed
             state["last_error"] = None
-            state["departures"] = len(cached)
+            state["departures"] = len(current)
             state["raw_departures"] = raw_departures
-            state["next_routes"] = [item["route"] for item in cached[:2]]
-            state["duplicates_removed"] = raw_departures - len(cached)
-            state["next_trips"] = [{"run_ref": item["run_ref"], "scheduled": item["scheduled"], "estimated": item["estimated"], "due": item["due"]} for item in cached[:2]]
+            state["next_routes"] = [item["route"] for item in current[:2]]
+            state["duplicates_removed"] = raw_departures - len(current)
+            state["next_trips"] = [{"run_ref": item["run_ref"], "scheduled": item["scheduled"], "estimated": item["estimated"], "due": item["due"]} for item in current[:2]]
         except Exception as error:
             state["last_error"] = str(error)[:80]
-            if cached:
-                display.show_departures(cached, "offline")
-            else:
-                display.show_error(str(error))
+            state["departures"] = 0
+            state["raw_departures"] = 0
+            state["next_routes"] = []
+            state["next_trips"] = []
+            state["duplicates_removed"] = 0
+            display.show_error(str(error))
         await asyncio.sleep(REFRESH_SECONDS)
 
 
 async def run():
     from secrets import PTV_API_KEY, PTV_DEVELOPER_ID
-    from wifi import connect
     display = TimetableDisplay()
-    connect()
+    display.show_error("Connecting")
     from control_server import serve
     state = {"last_refresh": None, "last_error": None, "departures": 0, "raw_departures": 0, "last_deploy": None}
     asyncio.create_task(refresh_loop(display, PTVClient(PTV_DEVELOPER_ID, PTV_API_KEY), state))

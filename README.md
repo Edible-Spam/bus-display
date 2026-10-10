@@ -1,8 +1,9 @@
 # PTV Bus Timetable Display
 
 MicroPython project for a single PTV stop on a HUB75 RGB LED panel driven by a
-Pimoroni Interstate 75 W. It polls PTV's v3 API every 30 seconds and retains
-the last departures when Wi-Fi or the API briefly fails.
+Pimoroni Interstate 75 W. It polls PTV's v3 API every 30 seconds and shows
+an unavailable message when Wi-Fi or the API fails. It retries every 30
+seconds and attempts to reconnect Wi-Fi automatically, including after boot.
 
 ## Setup
 
