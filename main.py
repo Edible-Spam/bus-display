@@ -21,7 +21,10 @@ def normalise(payload):
         direction = directions.get(str(departure.get("direction_id")), {})
         timestamp = departure.get("estimated_departure_utc") or departure.get("scheduled_departure_utc")
         if timestamp:
-            output.append({"route": route.get("route_number") or route.get("route_name") or "?",
+            route_number = route.get("route_number") or route.get("route_name") or "?"
+            if route_number == "250-251 combined":
+                route_number = "250-251"
+            output.append({"route": route_number,
                            "destination": direction.get("direction_name") or "Unknown",
                            "epoch": iso_to_epoch(timestamp)})
     return output

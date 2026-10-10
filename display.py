@@ -10,6 +10,8 @@ class TimetableDisplay:
         self.g = self.board.display
         self.g.set_font("bitmap8")
         self.compact = PANEL == "DISPLAY_INTERSTATE75_64X32"
+        if self.compact:
+            self.g.set_font("bitmap6")
         self.black = self.g.create_pen(0, 0, 0)
         self.white = self.g.create_pen(220, 220, 220)
         self.cyan = self.g.create_pen(0, 210, 230)
@@ -25,18 +27,24 @@ class TimetableDisplay:
         self.g.set_pen(self.black)
         self.g.clear()
 
+    def right_text(self, value, y, pen):
+        value = str(value)
+        x = 63 - self.g.measure_text(value, scale=1)
+        self.text(value, x, y, pen, len(value))
+
     def show_departures(self, departures, refreshed_at):
         self.clear()
         if self.compact:
-            # bitmap8 remains readable on the small panel. Two route/due rows
-            # fit without clipping; destination text needs a wider panel.
-            self.text(STOP_NAME, 1, 0, self.cyan, 7)
+            # bitmap6 fits both the seven-character combined route and a
+            # right-aligned countdown on a 64-pixel panel.
+            self.text("Pitt St" if STOP_NAME == "PITT ST" else STOP_NAME, 1, 0, self.cyan, 7)
+            self.right_text(format_clock(time.time()), 0, self.green)
             if not departures:
                 self.text("NO BUS", 1, 14, self.amber, 7)
             for index, item in enumerate(departures[:2]):
                 y = 11 + index * 11
-                self.text(item["route"], 1, y, self.green, 4)
-                self.text(item["due"], 39, y, self.amber, 3)
+                self.text(item["route"], 1, y, self.amber, 7)
+                self.right_text(item["due"], y, self.green)
             self.board.update()
             return
         self.text(STOP_NAME, 1, 0, self.cyan, 20)
@@ -45,9 +53,9 @@ class TimetableDisplay:
             self.text("No upcoming services", 1, 26, self.amber)
         for index, item in enumerate(departures[:3]):
             y = 18 + index * 14
-            self.text(item["route"], 1, y, self.green, 4)
+            self.text(item["route"], 1, y, self.amber, 4)
             self.text(item["destination"], 25, y, self.white, 13)
-            self.text(item["due"], 104, y, self.amber, 5)
+            self.text(item["due"], 104, y, self.green, 5)
         self.text("Updated " + refreshed_at, 1, 56, self.white, 20)
         self.board.update()
 
