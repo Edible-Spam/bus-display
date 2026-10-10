@@ -47,31 +47,12 @@ class TimetableDisplay:
         for y, row in enumerate(bitmap):
             for x, pixel in enumerate(row):
                 if pixel == "1":
-                    self.g.pixel(x + 15, y + 1)
-
-    def bus_icon(self):
-        # A 12x8 bitmap fits the header with the same one-pixel top margin.
-        bitmap = (
-            "011111111110",
-            "110000000011",
-            "111011011111",
-            "111011011111",
-            "111111111111",
-            "110111111011",
-            "011111111110",
-            "001100001100",
-        )
-        self.g.set_pen(self.cyan)
-        for y, row in enumerate(bitmap):
-            for x, pixel in enumerate(row):
-                if pixel == "1":
                     self.g.pixel(x + 1, y + 1)
 
     def show_departures(self, departures, refreshed_at):
         self.clear()
         if self.compact:
             # Keep the full combined route label and right-align the countdown.
-            self.bus_icon()
             self.ptv_icon()
             self.right_text(format_clock(time.time()), 0, self.red)
             if not departures:
@@ -97,7 +78,6 @@ class TimetableDisplay:
     def show_error(self, message):
         self.clear()
         if self.compact:
-            self.bus_icon()
             self.ptv_icon()
             self.text("ERROR", 1, 11, self.red, 7)
             self.text(message, 1, 22, self.amber, 7)
@@ -110,4 +90,6 @@ class TimetableDisplay:
 
 
 def format_clock(epoch):
-    return "%02d:%02d" % time.localtime(epoch + UTC_OFFSET_SECONDS)[3:5]
+    hour, minute = time.localtime(epoch + UTC_OFFSET_SECONDS)[3:5]
+    suffix = "am" if hour < 12 else "pm"
+    return "%d:%02d%s" % (hour % 12 or 12, minute, suffix)
