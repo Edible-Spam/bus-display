@@ -26,8 +26,37 @@ def normalise(payload):
                 route_number = "250-251"
             output.append({"route": route_number,
                            "destination": direction.get("direction_name") or "Unknown",
+                           "run_ref": departure.get("run_ref"),
+                           "stop_id": departure.get("stop_id"),
+                           "scheduled": departure.get("scheduled_departure_utc"),
+                           "estimated": bool(departure.get("estimated_departure_utc")),
                            "epoch": iso_to_epoch(timestamp)})
     return output
+
+
+def unique_departures(items):
+    unique = []
+    for item in items:
+        match = None
+        for existing in unique:
+            same_stop = item["stop_id"] == existing["stop_id"]
+            same_schedule = bool(item["scheduled"]) and item["scheduled"] == existing["scheduled"]
+            same_run = bool(item["run_ref"]) and item["run_ref"] == existing["run_ref"]
+            # The combined timetable can use a different run reference. Only
+            # merge it with an individual route at the exact scheduled time.
+            combined_pair = (item["route"] == "250-251" and existing["route"] in ("250", "251")) or (existing["route"] == "250-251" and item["route"] in ("250", "251"))
+            if same_stop and ((same_run and same_schedule) or (combined_pair and same_schedule)):
+                match = existing
+                break
+        if match is None:
+            unique.append(item.copy())
+        else:
+            if item["estimated"] and not match["estimated"]:
+                match["epoch"] = item["epoch"]
+                match["estimated"] = True
+            if match["route"] == "250-251" and item["route"] in ("250", "251"):
+                match["route"] = item["route"]
+    return unique
 
 
 def departures(client):
@@ -37,6 +66,7 @@ def departures(client):
         payload = client.departures(route_type, STOP_ID)
         raw_departures += len(payload.get("departures", []))
         all_departures.extend(normalise(payload))
+    all_departures = unique_departures(all_departures)
     all_departures.sort(key=lambda item: item["epoch"])
     now = time.time()
     for item in all_departures:
@@ -57,6 +87,8 @@ async def refresh_loop(display, client, state):
             state["departures"] = len(cached)
             state["raw_departures"] = raw_departures
             state["next_routes"] = [item["route"] for item in cached[:2]]
+            state["duplicates_removed"] = raw_departures - len(cached)
+            state["next_trips"] = [{"run_ref": item["run_ref"], "scheduled": item["scheduled"], "estimated": item["estimated"], "due": item["due"]} for item in cached[:2]]
         except Exception as error:
             state["last_error"] = str(error)[:80]
             if cached:
