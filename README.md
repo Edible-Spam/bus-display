@@ -18,3 +18,22 @@ Power the HUB75 panel from a separate, suitably rated 5 V supply; do not power
 it through the Interstate 75 W USB connection.
 
 Look up stop IDs and validate credentials in PTV's [v3 Swagger UI](https://timetableapi.ptv.vic.gov.au/swagger/ui/index). PTV requires every API call to include an HMAC-SHA1 signature.
+
+## Local-network control and deployment
+
+The display itself makes the PTV API calls. Once it is connected to Wi-Fi, it
+also provides an authenticated HTTP control endpoint on port `8080` for status
+and code deployment. It never serves, accepts, or replaces `secrets.py`.
+
+1. Put a long random `CONTROL_TOKEN` in `secrets.py` (and keep it private).
+2. Use a DHCP reservation in your router so the display has a stable IP address.
+3. For the first install, upload all board-side `.py` files by USB/Thonny,
+   including `control_server.py`. Do **not** upload `deploy.py`.
+4. Copy `deploy.example.json` to `deploy.local.json`; enter the device IP and
+   control token. This file is ignored by Git.
+5. On a computer with Python 3, run `python deploy.py` to upload the allow-listed
+   app files. The board confirms the upload, then restarts.
+
+Use this only on a trusted private LAN: do not port-forward the control port,
+do not expose it to the internet, and rotate the control token if it is ever
+disclosed. Every control request requires `Authorization: Bearer <token>`.

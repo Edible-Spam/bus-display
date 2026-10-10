@@ -1,5 +1,6 @@
 """Run this as main.py on the Interstate 75 W."""
 import time
+import uasyncio as asyncio
 from config import REFRESH_SECONDS, ROUTE_TYPES, STOP_ID
 from display import TimetableDisplay, format_clock
 from ptv import PTVClient
@@ -38,22 +39,34 @@ def departures(client):
     return all_departures
 
 
-def main():
-    from secrets import PTV_API_KEY, PTV_DEVELOPER_ID
-    from wifi import connect
-    display = TimetableDisplay()
-    connect()
-    client, cached = PTVClient(PTV_DEVELOPER_ID, PTV_API_KEY), []
+async def refresh_loop(display, client, state):
+    cached = []
     while True:
         try:
             cached = departures(client)
-            display.show_departures(cached, format_clock(time.time()))
+            refreshed = format_clock(time.time())
+            display.show_departures(cached, refreshed)
+            state["last_refresh"] = refreshed
+            state["last_error"] = None
+            state["departures"] = len(cached)
         except Exception as error:
+            state["last_error"] = str(error)[:80]
             if cached:
                 display.show_departures(cached, "offline")
             else:
                 display.show_error(str(error))
-        time.sleep(REFRESH_SECONDS)
+        await asyncio.sleep(REFRESH_SECONDS)
 
 
-main()
+async def run():
+    from secrets import PTV_API_KEY, PTV_DEVELOPER_ID
+    from wifi import connect
+    display = TimetableDisplay()
+    connect()
+    from control_server import serve
+    state = {"last_refresh": None, "last_error": None, "departures": 0, "last_deploy": None}
+    asyncio.create_task(refresh_loop(display, PTVClient(PTV_DEVELOPER_ID, PTV_API_KEY), state))
+    await serve(state)
+
+
+asyncio.run(run())

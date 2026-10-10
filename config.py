@@ -9,5 +9,10 @@ STOP_NAME = "Configure stop"
 MAX_RESULTS_PER_TYPE = 4
 REFRESH_SECONDS = 30
 REQUEST_TIMEOUT_SECONDS = 12
+# HTTP port for the authenticated, local-network status/deployment endpoint.
+CONTROL_PORT = 8080
+# Hard limit for a single deployment request; keeps a malformed request from
+# exhausting the Pico W's memory.
+CONTROL_MAX_BODY_BYTES = 24 * 1024
 # Australia/Melbourne: UTC+10 standard time; update to +11 during DST.
 UTC_OFFSET_SECONDS = 10 * 60 * 60
