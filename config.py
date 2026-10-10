@@ -19,5 +19,6 @@ CONTROL_PORT = 8080
 # Hard limit for a single deployment request; keeps a malformed request from
 # exhausting the Pico W's memory.
 CONTROL_MAX_BODY_BYTES = 24 * 1024
-# Australia/Melbourne: UTC+10 standard time; update to +11 during DST.
+# Australia/Melbourne standard offset. The renderer adds daylight saving
+# automatically using Victoria's April/October transition rules.
 UTC_OFFSET_SECONDS = 10 * 60 * 60

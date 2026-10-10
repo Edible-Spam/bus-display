@@ -89,7 +89,21 @@ class TimetableDisplay:
         self.board.update()
 
 
+def melbourne_offset(epoch):
+    # Work in standard time: both transitions occur at 02:00 AEST
+    # (the April transition is 03:00 AEDT).
+    local = time.localtime(epoch + UTC_OFFSET_SECONDS)
+    month, day, hour, weekday = local[1], local[2], local[3], local[6]
+    first_sunday = 1 + (6 - (weekday - (day - 1)) % 7) % 7
+    daylight = month < 4 or month > 10
+    if month == 4:
+        daylight = (day, hour) < (first_sunday, 2)
+    elif month == 10:
+        daylight = (day, hour) >= (first_sunday, 2)
+    return UTC_OFFSET_SECONDS + (3600 if daylight else 0)
+
+
 def format_clock(epoch):
-    hour, minute = time.localtime(epoch + UTC_OFFSET_SECONDS)[3:5]
+    hour, minute = time.localtime(epoch + melbourne_offset(epoch))[3:5]
     suffix = "am" if hour < 12 else "pm"
     return "%d:%02d%s" % (hour % 12 or 12, minute, suffix)
